@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using ConsoleApp.Demo.Extensions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 
 namespace ConsoleApp.Demo
 {
@@ -25,13 +27,14 @@ namespace ConsoleApp.Demo
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<ILoggerFactory, LoggerFactory>();
 
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
 
-           // 第一个 App.Run 委托中断了管道。在下面的例子中，只有第一个委托（“Hello, World!”）会被运行
+            // 第一个 App.Run 委托中断了管道。在下面的例子中，只有第一个委托（“Hello, World!”）会被运行
             //app.Run(async context =>
             //{
             //    await context.Response.WriteAsync("Hello World!");
@@ -53,6 +56,8 @@ namespace ConsoleApp.Demo
                 await next.Invoke();
                 await context.Response.WriteAsync("Hello New Year</br>");
             });
+
+            app.UserRequestLogger();
 
             app.Run(async context =>
             {
