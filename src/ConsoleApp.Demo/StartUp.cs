@@ -1,9 +1,11 @@
-﻿using ConsoleApp.Demo.Extensions;
+﻿using System.IO;
+using ConsoleApp.Demo.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
 
@@ -29,6 +31,9 @@ namespace ConsoleApp.Demo
         {
             services.AddSingleton<ILoggerFactory, LoggerFactory>();
 
+            //调用 AddDirectoryBrowser 扩展方法来增加直接访问目录所需服务
+            services.AddDirectoryBrowser();
+
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -47,6 +52,30 @@ namespace ConsoleApp.Demo
             loggerFactory
              .AddConsole()
              .AddDebug(LogLevel.Information);
+
+            //UseDefaultFiles 必须在 UseStaticFiles 之前调用。UseDefaultFiles 只是重写了 URL，而不是真的提供了这样一个文件。
+            // 必须开启静态文件中间件（UseStaticFiles）来提供这个文件
+            app.UseDefaultFiles();
+
+            // 配置静态文件服务,
+            // 通过配置静态文件中间件加入到管道中，即可配置静态文件服务
+            app.UseStaticFiles();
+
+            // 静态文件的位于 web root 的外部的配置
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"anothorstaticfiles")),
+                RequestPath = new PathString("/staticfiles")
+            });
+
+            // 允许直接浏览目录的配置
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),@"wwwroot\images")),
+                RequestPath = new PathString("/imagesdir")
+            });
+
+       
 
             // 将多个请求委托彼此链接在一起；next 参数表示管道内下一个委托。
             // 通过 不 调用 next 参数，你可以中断（短路）管道。
