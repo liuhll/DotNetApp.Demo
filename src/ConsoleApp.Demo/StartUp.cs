@@ -88,6 +88,7 @@ namespace ConsoleApp.Demo
                 await context.Response.WriteAsync("Hello New Year</br>");
             });
 
+            // 使用自定义的中间件
             app.UserRequestLogger();
 
             app.Run(async context =>
