@@ -27,7 +27,7 @@ namespace ConsoleApp.Demo
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<ILoggerFactory, LoggerFactory>();
+            services.AddSingleton<ILoggerFactory, LoggerFactory>();
 
         }
 
@@ -44,7 +44,9 @@ namespace ConsoleApp.Demo
             //{
             //    await context.Response.WriteAsync("Hello, World, Again!");
             //});
-
+            loggerFactory
+             .AddConsole()
+             .AddDebug(LogLevel.Information);
 
             // 将多个请求委托彼此链接在一起；next 参数表示管道内下一个委托。
             // 通过 不 调用 next 参数，你可以中断（短路）管道。

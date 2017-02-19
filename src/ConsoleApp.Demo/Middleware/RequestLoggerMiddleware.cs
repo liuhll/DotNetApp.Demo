@@ -14,10 +14,7 @@ namespace ConsoleApp.Demo.Middleware
         //依赖注入，对loggerFactory注入需要在ConfigureServices对日志工厂进行配置，否则无法注入
         public RequestLoggerMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
-            _next = next;
-            loggerFactory
-            .AddConsole()
-            .AddDebug(LogLevel.Information);
+            _next = next;           
             _logger = loggerFactory.CreateLogger<RequestLoggerMiddleware>();
         }
 
